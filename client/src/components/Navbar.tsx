@@ -1,9 +1,18 @@
 import { Link, useLocation } from "wouter";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Search, Menu } from "lucide-react";
+import { ShoppingBag, Search, Menu, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
@@ -16,8 +25,9 @@ interface NavbarProps {
 }
 
 export function Navbar({ onSearch, searchQuery = "" }: NavbarProps) {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { toggleCart, cartCount } = useCart();
+  const { currentUser, logout } = useAuth();
   const [search, setSearch] = useState(searchQuery);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -29,8 +39,28 @@ export function Navbar({ onSearch, searchQuery = "" }: NavbarProps) {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setLocation('/');
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
+
   const isActiveLink = (path: string) => {
     return location === path ? "text-primary" : "text-gray-700 hover:text-primary";
+  };
+  
+  const getInitials = () => {
+    if (currentUser?.displayName) {
+      return currentUser.displayName
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase();
+    }
+    return 'U';
   };
 
   return (
@@ -84,6 +114,45 @@ export function Navbar({ onSearch, searchQuery = "" }: NavbarProps) {
             )}
           </Button>
           
+          {currentUser ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative rounded-full h-8 w-8 p-0">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={currentUser.photoURL || ''} alt={currentUser.displayName || ''} />
+                    <AvatarFallback>{getInitials()}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="flex flex-col space-y-1 p-2">
+                  <p className="text-sm font-medium">{currentUser.displayName || 'Usuario'}</p>
+                  <p className="text-xs text-gray-500 truncate">{currentUser.email}</p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/profile" className="cursor-pointer flex items-center">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Mi Perfil</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Cerrar Sesión</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="hidden md:flex items-center space-x-2">
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/login">Iniciar Sesión</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link href="/signup">Registrarse</Link>
+              </Button>
+            </div>
+          )}
+          
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
@@ -121,6 +190,36 @@ export function Navbar({ onSearch, searchQuery = "" }: NavbarProps) {
                   <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 hover:text-primary transition-colors">
                     Contacto
                   </Link>
+                  
+                  {!currentUser && (
+                    <>
+                      <div className="border-t border-gray-200 my-2"></div>
+                      <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 hover:text-primary transition-colors">
+                        Iniciar Sesión
+                      </Link>
+                      <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 hover:text-primary transition-colors">
+                        Registrarse
+                      </Link>
+                    </>
+                  )}
+                  
+                  {currentUser && (
+                    <>
+                      <div className="border-t border-gray-200 my-2"></div>
+                      <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 hover:text-primary transition-colors">
+                        Mi Perfil
+                      </Link>
+                      <button 
+                        onClick={() => {
+                          handleLogout();
+                          setIsMobileMenuOpen(false);
+                        }} 
+                        className="text-left text-red-600 hover:text-red-700 transition-colors"
+                      >
+                        Cerrar Sesión
+                      </button>
+                    </>
+                  )}
                 </nav>
               </div>
             </SheetContent>
