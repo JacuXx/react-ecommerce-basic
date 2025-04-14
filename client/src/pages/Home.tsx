@@ -4,6 +4,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/ProductCard";
 import { Product } from "@/context/CartContext";
+import { HeroSlideshow } from "@/components/HeroSlideshow";
 import { 
   Truck, 
   RefreshCw, 
@@ -53,26 +54,9 @@ export default function Home() {
 
   return (
     <main className="flex-1">
-      {/* Hero Banner */}
-      <div className="bg-gradient-to-r from-blue-700 to-blue-500 text-white py-16 md:py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl">
-            <h1 className="text-3xl md:text-5xl font-bold mb-4">Tu tienda online favorita</h1>
-            <p className="text-lg md:text-xl opacity-90 mb-8">
-              Descubre los mejores productos al mejor precio. Envíos gratis a partir de $1000 MXN.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/products">
-                <Button className="px-6 py-3 bg-white text-primary font-semibold rounded-lg hover:bg-gray-100 transition text-center w-full sm:w-auto">
-                  Ver productos
-                </Button>
-              </Link>
-              <Button variant="outline" className="px-6 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white/10 transition text-center w-full sm:w-auto">
-                Nuestras ofertas
-              </Button>
-            </div>
-          </div>
-        </div>
+      {/* Hero Slideshow */}
+      <div className="container mx-auto px-4 pt-8">
+        <HeroSlideshow />
       </div>
 
       {/* Category Highlights */}

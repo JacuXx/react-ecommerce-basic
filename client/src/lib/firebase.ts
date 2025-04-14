@@ -1,10 +1,9 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
-console.log("🔥 Variables de entorno:");
-console.log("API KEY:", import.meta.env.VITE_FIREBASE_API_KEY);
-console.log("PROJECT ID:", import.meta.env.VITE_FIREBASE_PROJECT_ID);
-console.log("APP ID:", import.meta.env.VITE_FIREBASE_APP_ID);
+console.log("API Key:", import.meta.env.VITE_FIREBASE_API_KEY);
+console.log("Project ID:", import.meta.env.VITE_FIREBASE_PROJECT_ID);
+console.log("App ID:", import.meta.env.VITE_FIREBASE_APP_ID);
 
 // Firebase configuration
 const firebaseConfig = {
